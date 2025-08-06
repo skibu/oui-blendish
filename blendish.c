@@ -516,7 +516,7 @@ void bndMenuItem(NVGcontext *ctx,
     }
     bndIconLabelValue(ctx,x,y,w,h,iconid,
         bndTextColor(&bnd_theme.menuItemTheme, state), BND_LEFT,
-        BND_LABEL_FONT_SIZE /* FIXME need to adjuts font size for Liminal*/, label, NULL);
+        BND_LABEL_FONT_SIZE /* FIXME 2 need to adjuts font size for Liminal*/, label, NULL);
 }
 
 void bndNodePort(NVGcontext *ctx, float x, float y, BNDwidgetState state,
