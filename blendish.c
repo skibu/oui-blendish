@@ -70,7 +70,7 @@ static double bnd_fmax ( double a, double b )
 
 ////////////////////////////////////////////////////////////////////////////////
 
-BND_INLINE float bnd_clamp(float v, float mn, float mx) {
+static float bnd_clamp(float v, float mn, float mx) {
     return (v > mx)?mx:(v < mn)?mn:v;
 }
 
@@ -248,13 +248,20 @@ void bndSetFont(int font) {
     bnd_font = font;
 }
 
+// Global font size for labels and text fields
+// This is set to the default Blender 2.6 font size.
+static int bnd_label_font_size = BND_LABEL_FONT_SIZE;
+
+void bndSetLabelFontSize(int fontSize) {
+    bnd_label_font_size = fontSize;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
-void bndLabel(NVGcontext *ctx,
-    float x, float y, float w, float h, int iconid, const char *label) {
+void bndLabel(NVGcontext *ctx, float x, float y, float w, float h, int iconid, const char *label) {
     bndIconLabelValue(ctx,x,y,w,h,iconid,
         bnd_theme.regularTheme.textColor, BND_LEFT,
-        BND_LABEL_FONT_SIZE, label, NULL);
+        bnd_label_font_size, label, NULL);
 }
 
 void bndToolButton(NVGcontext *ctx,
@@ -271,7 +278,7 @@ void bndToolButton(NVGcontext *ctx,
         bndTransparent(bnd_theme.toolTheme.outlineColor));
     bndIconLabelValue(ctx,x,y,w,h,iconid,
         bndTextColor(&bnd_theme.toolTheme, state), BND_CENTER,
-        BND_LABEL_FONT_SIZE, label, NULL);
+        bnd_label_font_size, label, NULL);
 }
 
 void bndRadioButton(NVGcontext *ctx,
@@ -288,13 +295,13 @@ void bndRadioButton(NVGcontext *ctx,
         bndTransparent(bnd_theme.radioTheme.outlineColor));
     bndIconLabelValue(ctx,x,y,w,h,iconid,
         bndTextColor(&bnd_theme.radioTheme, state), BND_CENTER,
-        BND_LABEL_FONT_SIZE, label, NULL);
+        bnd_label_font_size, label, NULL);
 }
 
 int bndTextFieldTextPosition(NVGcontext *ctx, float x, float y, float w, float h,
     int iconid, const char *text, int px, int py) {
     return bndIconLabelTextPosition(ctx, x, y, w, h,
-        iconid, BND_LABEL_FONT_SIZE, text, px, py);
+        iconid, bnd_label_font_size, text, px, py);
 }
 
 void bndTextField(NVGcontext *ctx,
@@ -313,7 +320,7 @@ void bndTextField(NVGcontext *ctx,
         cend = -1;
     }
     bndIconLabelCaret(ctx,x,y,w,h,iconid,
-        bndTextColor(&bnd_theme.textFieldTheme, state), BND_LABEL_FONT_SIZE,
+        bndTextColor(&bnd_theme.textFieldTheme, state), bnd_label_font_size,
         text, bnd_theme.textFieldTheme.itemColor, cbegin, cend);
 }
 
@@ -343,7 +350,7 @@ void bndOptionButton(NVGcontext *ctx,
     }
     bndIconLabelValue(ctx,x+12,y,w-12,h,-1,
         bndTextColor(&bnd_theme.optionTheme, state), BND_LEFT,
-        BND_LABEL_FONT_SIZE, label, NULL);
+        bnd_label_font_size, label, NULL);
 }
 
 void bndChoiceButton(NVGcontext *ctx,
@@ -360,7 +367,7 @@ void bndChoiceButton(NVGcontext *ctx,
         bndTransparent(bnd_theme.choiceTheme.outlineColor));
     bndIconLabelValue(ctx,x,y,w,h,iconid,
         bndTextColor(&bnd_theme.choiceTheme, state), BND_LEFT,
-        BND_LABEL_FONT_SIZE, label, NULL);
+        bnd_label_font_size, label, NULL);
     bndUpDownArrow(ctx,x+w-10,y+10,5,
         bndTransparent(bnd_theme.choiceTheme.itemColor));
 }
@@ -389,7 +396,7 @@ void bndNumberField(NVGcontext *ctx,
         bndTransparent(bnd_theme.numberFieldTheme.outlineColor));
     bndIconLabelValue(ctx,x,y,w,h,-1,
         bndTextColor(&bnd_theme.numberFieldTheme, state), BND_CENTER,
-        BND_LABEL_FONT_SIZE, label, value);
+        bnd_label_font_size, label, value);
     bndArrow(ctx,x+8,y+10,-BND_NUMBER_ARROW_SIZE,
         bndTransparent(bnd_theme.numberFieldTheme.itemColor));
     bndArrow(ctx,x+w-8,y+10,BND_NUMBER_ARROW_SIZE,
@@ -426,7 +433,7 @@ void bndSlider(NVGcontext *ctx,
         bndTransparent(bnd_theme.sliderTheme.outlineColor));
     bndIconLabelValue(ctx,x,y,w,h,-1,
         bndTextColor(&bnd_theme.sliderTheme, state), BND_CENTER,
-        BND_LABEL_FONT_SIZE, label, value);
+        bnd_label_font_size, label, value);
 }
 
 void bndScrollBar(NVGcontext *ctx,
@@ -500,7 +507,7 @@ void bndMenuLabel(NVGcontext *ctx,
     float x, float y, float w, float h, int iconid, const char *label) {
     bndIconLabelValue(ctx,x,y,w,h,iconid,
         bnd_theme.menuTheme.textColor, BND_LEFT,
-        BND_LABEL_FONT_SIZE, label, NULL);
+        bnd_label_font_size, label, NULL);
 }
 
 void bndMenuItem(NVGcontext *ctx,
@@ -516,7 +523,7 @@ void bndMenuItem(NVGcontext *ctx,
     }
     bndIconLabelValue(ctx,x,y,w,h,iconid,
         bndTextColor(&bnd_theme.menuItemTheme, state), BND_LEFT,
-        BND_LABEL_FONT_SIZE /* FIXME 2 need to adjuts font size for Liminal*/, label, NULL);
+        bnd_label_font_size, label, NULL);
 }
 
 void bndNodePort(NVGcontext *ctx, float x, float y, BNDwidgetState state,
@@ -577,22 +584,22 @@ void bndNodeBackground(NVGcontext *ctx, float x, float y, float w, float h,
         w-BND_NODE_ARROW_AREA_WIDTH-BND_NODE_MARGIN_SIDE,BND_NODE_TITLE_HEIGHT,
         iconid, bnd_theme.regularTheme.textColor,
         bndOffsetColor(titleColor, BND_BEVEL_SHADE),
-        BND_LEFT, BND_LABEL_FONT_SIZE, label);
-    NVGcolor arrowColor;
+        BND_LEFT, bnd_label_font_size, label);
+    // NVGcolor arrowColor;
     NVGcolor borderColor;
     switch(state) {
     default:
     case BND_DEFAULT: {
         borderColor = nvgRGBf(0,0,0);
-        arrowColor = bndOffsetColor(titleColor, -BND_BEVEL_SHADE);
+        // arrowColor = bndOffsetColor(titleColor, -BND_BEVEL_SHADE);
     } break;
     case BND_HOVER: {
         borderColor = bnd_theme.nodeTheme.nodeSelectedColor;
-        arrowColor = bnd_theme.nodeTheme.nodeSelectedColor;
+        // arrowColor = bnd_theme.nodeTheme.nodeSelectedColor;
     } break;
     case BND_ACTIVE: {
         borderColor = bnd_theme.nodeTheme.activeNodeColor;
-        arrowColor = bnd_theme.nodeTheme.nodeSelectedColor;
+        // arrowColor = bnd_theme.nodeTheme.nodeSelectedColor;
     } break;
     }
     bndOutlineBox(ctx,x,y,w,h+1,
@@ -736,7 +743,7 @@ float bndLabelWidth(NVGcontext *ctx, int iconid, const char *label) {
     }
     if (label && (bnd_font >= 0)) {
         nvgFontFaceId(ctx, bnd_font);
-        nvgFontSize(ctx, BND_LABEL_FONT_SIZE);
+        nvgFontSize(ctx, bnd_label_font_size);
         float bounds[4];
         nvgTextBoxBounds(ctx, 1, 1, INFINITY, label, NULL, bounds);
         w += bounds[2];
@@ -752,7 +759,7 @@ float bndLabelHeight(NVGcontext *ctx, int iconid, const char *label, float width
     }
     if (label && (bnd_font >= 0)) {
         nvgFontFaceId(ctx, bnd_font);
-        nvgFontSize(ctx, BND_LABEL_FONT_SIZE);
+        nvgFontSize(ctx, bnd_label_font_size);
         float bounds[4];
         nvgTextBoxBounds(ctx, 1, 1, width, label, NULL, bounds);
         int bh = (int)(bounds[3] - bounds[1]) + BND_TEXT_PAD_DOWN;
