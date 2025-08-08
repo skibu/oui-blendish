@@ -183,7 +183,7 @@ static BNDtheme bnd_theme = {
     {
         {{{ 0,0,0,1 }}}, // color_outline
         {{{ 0.392,0.392,0.392,1 }}}, // color_item
-        {{{ 0.098, 0.098, 0.098, 0.902 }}}, // color_inner
+        {{{ 0.098, 0.098, 1.0/*0.098*/, 0.902 }}}, // color_inner
         {{{ 0.176, 0.176, 0.176, 0.902 }}}, // color_inner_selected
         {{{ 0.627, 0.627, 0.627, 1 }}}, // color_text
         BND_COLOR_TEXT_SELECTED, // color_text_selected
@@ -194,8 +194,8 @@ static BNDtheme bnd_theme = {
     {
         {{{ 0,0,0,1 }}}, // color_outline
         {{{ 0.392,0.392,0.392,1 }}}, // color_item
-        {{{ 0.098, 0.098, 0.098, 0.902 }}}, // color_inner
-        {{{ 0.176, 0.176, 0.176, 0.902 }}}, // color_inner_selected
+        {{{ 1.0 /*0.098*/, 0.098, 0.098, 0.902 }}}, // color_inner
+        {{{ 0.176, 1.0/*0.176*/, 0.176, 0.902 }}}, // color_inner_selected
         {{{ 0.627, 0.627, 0.627, 1 }}}, // color_text
         BND_COLOR_TEXT_SELECTED, // color_text_selected
         0, // shade_top
@@ -432,7 +432,7 @@ void bndSlider(NVGcontext *ctx,
     bndOutlineBox(ctx,x,y,w,h,cr[0],cr[1],cr[2],cr[3],
         bndTransparent(bnd_theme.sliderTheme.outlineColor));
     bndIconLabelValue(ctx,x,y,w,h,-1,
-        bndTextColor(&bnd_theme.sliderTheme, state), BND_CENTER,
+        bndTextColor(&bnd_theme.sliderTheme, state), BND_LEFT,
         bnd_label_font_size, label, value);
 }
 
