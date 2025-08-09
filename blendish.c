@@ -251,9 +251,14 @@ void bndSetFont(int font) {
 // Global font size for labels and text fields
 // This is set to the default Blender 2.6 font size.
 static int bnd_label_font_size = BND_LABEL_FONT_SIZE;
+static int bnd_widget_height = BND_WIDGET_HEIGHT;
 
 void bndSetLabelFontSize(int fontSize) {
     bnd_label_font_size = fontSize;
+}
+
+void bndSetWidgetHeight(int height) {
+    bnd_widget_height = height;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -752,7 +757,7 @@ float bndLabelWidth(NVGcontext *ctx, int iconid, const char *label) {
 }
 
 float bndLabelHeight(NVGcontext *ctx, int iconid, const char *label, float width) {
-	int h = BND_WIDGET_HEIGHT;
+    int h = bnd_widget_height;
     width -= BND_TEXT_RADIUS*2;
     if (iconid >= 0) {
         width -= BND_ICON_SHEET_RES;
@@ -996,7 +1001,7 @@ void bndIconLabelValue(NVGcontext *ctx, float x, float y, float w, float h,
                     + nvgTextBounds(ctx, 1, 1, value, NULL, NULL);
                 x += ((w-BND_PAD_RIGHT-pleft)-width)*0.5f;
             }
-            y += BND_WIDGET_HEIGHT-BND_TEXT_PAD_DOWN;
+            y += bnd_widget_height - BND_TEXT_PAD_DOWN;
             nvgText(ctx, x, y, label, NULL);
             x += label_width;
             nvgText(ctx, x, y, BND_LABEL_SEPARATOR, NULL);
@@ -1006,8 +1011,8 @@ void bndIconLabelValue(NVGcontext *ctx, float x, float y, float w, float h,
             nvgTextAlign(ctx,
                 (align==BND_LEFT)?(NVG_ALIGN_LEFT|NVG_ALIGN_BASELINE):
                 (NVG_ALIGN_CENTER|NVG_ALIGN_BASELINE));
-            nvgTextBox(ctx,x+pleft,y+BND_WIDGET_HEIGHT-BND_TEXT_PAD_DOWN,
-                w-BND_PAD_RIGHT-pleft,label, NULL);
+            nvgTextBox(ctx, x + pleft, y + bnd_widget_height - BND_TEXT_PAD_DOWN,
+                       w - BND_PAD_RIGHT - pleft, label, NULL);
         }
     } else if (iconid >= 0) {
         bndIcon(ctx,x+2,y+2,iconid);
@@ -1047,7 +1052,7 @@ int bndIconLabelTextPosition(NVGcontext *ctx, float x, float y, float w, float h
     if (bnd_font < 0) return -1;
 
     x += pleft;
-    y += BND_WIDGET_HEIGHT - BND_TEXT_PAD_DOWN;
+    y += bnd_widget_height - BND_TEXT_PAD_DOWN;
 
     nvgFontFaceId(ctx, bnd_font);
     nvgFontSize(ctx, fontsize);
@@ -1110,7 +1115,7 @@ void bndIconLabelCaret(NVGcontext *ctx, float x, float y, float w, float h,
     if (bnd_font < 0) return;
 
     x+=pleft;
-    y+=BND_WIDGET_HEIGHT-BND_TEXT_PAD_DOWN;
+    y += bnd_widget_height - BND_TEXT_PAD_DOWN;
 
     nvgFontFaceId(ctx, bnd_font);
     nvgFontSize(ctx, fontsize);
