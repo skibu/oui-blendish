@@ -526,7 +526,10 @@ void bndMenuItem(NVGcontext *ctx,
                 bnd_theme.menuItemTheme.shadeDown));
         state = BND_ACTIVE;
     }
-    bndIconLabelValue(ctx,x,y,w,h,iconid,
+
+    // Draw the label, and center it vertically
+    float y_centering_offset = (h - bnd_label_font_size) / 2.0;
+    bndIconLabelValue(ctx,x,y-y_centering_offset,w,h,iconid,
         bndTextColor(&bnd_theme.menuItemTheme, state), BND_LEFT,
         bnd_label_font_size, label, NULL);
 }
