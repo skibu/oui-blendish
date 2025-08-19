@@ -857,6 +857,11 @@ BND_EXPORT void bndSetIconImage(int image);
 // https://svn.blender.org/svnroot/bf-blender/trunk/blender/release/datafiles/fonts/
 BND_EXPORT void bndSetFont(int font);
 
+// Allows the font size to be specified externally, instead of using define statement.
+// Used when want to use non-default font size of BND_LABEL_FONT_SIZE
+BND_EXPORT void bndSetLabelFontSize(int fontSize);
+BND_EXPORT void bndSetWidgetHeight(int height);
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // High Level Functions
@@ -985,7 +990,8 @@ BND_EXPORT void bndMenuLabel(NVGcontext *ctx,
 // where state denotes the widgets current UI state.
 // if iconid >= 0, an icon will be added to the widget
 // if label is not NULL, a label will be added to the widget
-// widget looks best when height is BND_WIDGET_HEIGHT
+// widget looks best when height is BND_WIDGET_HEIGHT.
+// The label is centered vertically.
 BND_EXPORT void bndMenuItem(NVGcontext *ctx,
     float x, float y, float w, float h, BNDwidgetState state,
     int iconid, const char *label);
@@ -1032,23 +1038,34 @@ BND_EXPORT void bndJoinAreaOverlay(NVGcontext *ctx, float x, float y, float w, f
 // -------------------
 // Use these functions to estimate sizes for widgets with your NVGcontext.
 
-// returns the ideal width for a label with given icon and text
+// returns the ideal width for a label with given icon and text. Uses globals bnd_font
+// and bnd_label_font_size.
 BND_EXPORT float bndLabelWidth(NVGcontext *ctx, int iconid, const char *label);
 
+// Returns the ideal width for a label with given icon, font size, and text
+BND_EXPORT float bndLabelWidthForFontSize(NVGcontext *ctx, int iconid, int font_size, const char *label);
+
 // returns the height for a label with given icon, text and width; this
-// function is primarily useful in conjunction with multiline labels and textboxes
+// function is primarily useful in conjunction with multiline labels and textboxes.
+// Uses globals bnd_font, bnd_label_font_size, and bnd_widget_height.
 BND_EXPORT float bndLabelHeight(NVGcontext *ctx, int iconid, const char *label,
     float width);
 
-////////////////////////////////////////////////////////////////////////////////
+// returns the height for a label with given icon, font size, text and width; this
+// function is primarily useful in conjunction with multiline labels and textboxes.
+// Uses globals bnd_font, bnd_label_font_size, and bnd_widget_height.
+BND_EXPORT float bndLabelHeightForFontSize(NVGcontext *ctx, int iconid, int font_size,
+                                           const char *label, float width);
 
-// Low Level Functions
-// -------------------
-// these are part of the implementation detail and can be used to theme
-// new kinds of controls in a similar fashion.
+    ////////////////////////////////////////////////////////////////////////////////
 
-// make color transparent using the default alpha value
-BND_EXPORT NVGcolor bndTransparent(NVGcolor color);
+    // Low Level Functions
+    // -------------------
+    // these are part of the implementation detail and can be used to theme
+    // new kinds of controls in a similar fashion.
+
+    // make color transparent using the default alpha value
+    BND_EXPORT NVGcolor bndTransparent(NVGcolor color);
 
 // offset a color by a given integer delta in the range -100 to 100
 BND_EXPORT NVGcolor bndOffsetColor(NVGcolor color, int delta);
@@ -1086,6 +1103,11 @@ BND_EXPORT void bndRoundedBox(NVGcontext *ctx, float x, float y, float w, float 
 // Draw a flat panel without any decorations at position (x,y) with size (w,h)
 // and fills it with backgroundColor
 BND_EXPORT void bndBackground(NVGcontext *ctx, float x, float y, float w, float h);
+
+// Draw a flat panel without any decorations at position (x,y) with size (w,h)
+// and fills it with specified color
+BND_EXPORT void bndBackgroundColor(NVGcontext *ctx, float x, float y, float w, float h,
+                                   float radius, NVGcolor backgroundColor, NVGcolor outlineColor);
 
 // Draw a beveled border at position (x,y) with size (w,h) shaded with
 // lighter and darker versions of backgroundColor

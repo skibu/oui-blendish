@@ -745,13 +745,17 @@ void bndJoinAreaOverlay(NVGcontext *ctx, float x, float y, float w, float h,
 ////////////////////////////////////////////////////////////////////////////////
 
 float bndLabelWidth(NVGcontext *ctx, int iconid, const char *label) {
+    return bndLabelWidthForFontSize(ctx, iconid, bnd_label_font_size, label);
+}
+
+float bndLabelWidthForFontSize(NVGcontext *ctx, int iconid, int font_size, const char *label) {
     int w = BND_PAD_LEFT + BND_PAD_RIGHT;
     if (iconid >= 0) {
         w += BND_ICON_SHEET_RES;
     }
     if (label && (bnd_font >= 0)) {
         nvgFontFaceId(ctx, bnd_font);
-        nvgFontSize(ctx, bnd_label_font_size);
+        nvgFontSize(ctx, font_size);
         float bounds[4];
         nvgTextBoxBounds(ctx, 1, 1, INFINITY, label, NULL, bounds);
         w += bounds[2];
@@ -760,6 +764,11 @@ float bndLabelWidth(NVGcontext *ctx, int iconid, const char *label) {
 }
 
 float bndLabelHeight(NVGcontext *ctx, int iconid, const char *label, float width) {
+    return bndLabelWidthForFontSize(ctx, iconid, bnd_label_font_size, label);
+}
+
+float bndLabelHeightForFontSize(NVGcontext *ctx, int iconid, int font_size, const char *label,
+                                float width) {
     int h = bnd_widget_height;
     width -= BND_TEXT_RADIUS*2;
     if (iconid >= 0) {
@@ -767,7 +776,7 @@ float bndLabelHeight(NVGcontext *ctx, int iconid, const char *label, float width
     }
     if (label && (bnd_font >= 0)) {
         nvgFontFaceId(ctx, bnd_font);
-        nvgFontSize(ctx, bnd_label_font_size);
+        nvgFontSize(ctx, font_size);
         float bounds[4];
         nvgTextBoxBounds(ctx, 1, 1, width, label, NULL, bounds);
         int bh = (int)(bounds[3] - bounds[1]) + BND_TEXT_PAD_DOWN;
@@ -872,6 +881,18 @@ void bndBackground(NVGcontext *ctx, float x, float y, float w, float h) {
     nvgRect(ctx, x, y, w, h);
     nvgFillColor(ctx, bnd_theme.backgroundColor);
     nvgFill(ctx);
+}
+
+void bndBackgroundColor(NVGcontext *ctx, float x, float y, float w, float h, float radius,
+                        NVGcolor backgroundColor, NVGcolor outlineColor) {
+    // Set the radius info
+    float cr[4];
+    bndSelectCorners(cr, radius, 0);
+
+    // Draw the boxes and the drop shadow
+    bndInnerBox(ctx, x, y, w, h + 1, cr[0], cr[1], cr[2], cr[3], backgroundColor, backgroundColor);
+    bndOutlineBox(ctx, x, y, w, h + 1, cr[0], cr[1], cr[2], cr[3], bndTransparent(outlineColor));
+    bndDropShadow(ctx, x, y, w, h, BND_MENU_RADIUS, BND_SHADOW_FEATHER, BND_SHADOW_ALPHA);
 }
 
 void bndIcon(NVGcontext *ctx, float x, float y, int iconid) {
