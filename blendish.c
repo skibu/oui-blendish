@@ -257,8 +257,16 @@ void bndSetLabelFontSize(int fontSize) {
     bnd_label_font_size = fontSize;
 }
 
+int bndGetLabelFontSize(void) {
+    return bnd_label_font_size;
+}   
+
 void bndSetWidgetHeight(int height) {
     bnd_widget_height = height;
+}
+
+int bndGetWidgetHeight(void) {
+    return bnd_widget_height;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
