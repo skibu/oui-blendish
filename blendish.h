@@ -1050,29 +1050,37 @@ BND_EXPORT float bndLabelWidth(NVGcontext *ctx, int iconid, const char *label);
 // Returns the ideal width for a label with given icon, font size, and text
 BND_EXPORT float bndLabelWidthForFontSize(NVGcontext *ctx, int iconid, int font_size, const char *label);
 
-// returns the height for a label with given icon, text and width; this
-// function is primarily useful in conjunction with multiline labels and textboxes.
-// Uses globals bnd_font, bnd_label_font_size, and bnd_widget_height.
+/**
+ * Returns the height for a label with the given icon, text, and width.
+ * This function is primarily useful in conjunction with multiline labels and textboxes.
+ * Uses globals bnd_font, bnd_label_font_size, and bnd_widget_height.
+ * The width parameter can be set to constrain the label to a specific width and have the text wrap.
+ * If you don't want the text to wrap, use a value like INFINITY.
+ */
 BND_EXPORT float bndLabelHeight(NVGcontext *ctx, int iconid, const char *label,
     float width);
 
-// returns the height for a label with given icon, font size, text and width; this
-// function is primarily useful in conjunction with multiline labels and textboxes.
-// Uses globals bnd_font, bnd_label_font_size, and bnd_widget_height.
+/**
+ * Returns the height for a label with the given icon, font size, text, and width.
+ * This function is primarily useful in conjunction with multiline labels and textboxes.
+ * Uses globals bnd_font and bnd_widget_height.
+ * The width parameter can be set to constrain the label to a specific width and have the text wrap.
+ * If you don't want the text to wrap, use a value like INFINITY.
+ */
 BND_EXPORT float bndLabelHeightForFontSize(NVGcontext *ctx, int iconid, int font_size,
                                            const char *label, float width);
 
-    ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-    // Low Level Functions
-    // -------------------
-    // these are part of the implementation detail and can be used to theme
-    // new kinds of controls in a similar fashion.
+// Low Level Functions
+// -------------------
+// these are part of the implementation detail and can be used to theme
+// new kinds of controls in a similar fashion.
 
-    // make color transparent using the default alpha value
-    BND_EXPORT NVGcolor bndTransparent(NVGcolor color);
+// make color transparent using the default alpha value
+BND_EXPORT NVGcolor bndTransparent(NVGcolor color);
 
-// offset a color by a given integer delta in the range -100 to 100
+// Offset rgb values of a color by a given integer delta in the range -100 to 100
 BND_EXPORT NVGcolor bndOffsetColor(NVGcolor color, int delta);
 
 // assigns radius r to the four entries of array radiuses depending on whether
@@ -1090,18 +1098,20 @@ BND_EXPORT void bndInnerColors(NVGcolor *shade_top, NVGcolor *shade_down,
 // widgets state.
 BND_EXPORT NVGcolor bndTextColor(const BNDwidgetTheme *theme, BNDwidgetState state);
 
-// computes the bounds of the scrollbar handle from the scrollbar size
-// and the handles offset and size.
-// offset is in the range 0..1 and defines the position of the scroll handle
-// size is in the range 0..1 and defines the size of the scroll handle
+/* computes the bounds of the scrollbar handle from the scrollbar size
+and the handles offset and size.
+offset is in the range 0..1 and defines the position of the scroll handle
+size is in the range 0..1 and defines the size of the scroll handle */
 BND_EXPORT void bndScrollHandleRect(float *x, float *y, float *w, float *h,
     float offset, float size);
 
-// Add a rounded box path at position (x,y) with size (w,h) and a separate
-// radius for each corner listed in clockwise order, so that cr0 = top left,
-// cr1 = top right, cr2 = bottom right, cr3 = bottom left;
-// this is a low level drawing function: the path must be stroked or filled
-// to become visible.
+/**
+ * Add a rounded box path at position (x,y) with size (w,h) and a separate
+ * radius for each corner listed in clockwise order, so that cr0 = top left,
+ * cr1 = top right, cr2 = bottom right, cr3 = bottom left;
+ * this is a low level drawing function: the path must be stroked or filled
+ * to become visible.
+ */
 BND_EXPORT void bndRoundedBox(NVGcontext *ctx, float x, float y, float w, float h,
     float cr0, float cr1, float cr2, float cr3);
 

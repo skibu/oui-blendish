@@ -453,6 +453,7 @@ void bndScrollBar(NVGcontext *ctx,
     float x, float y, float w, float h, BNDwidgetState state,
     float offset, float size) {
 
+    // Draw the scrollbar track that is the background of the scrollbar
     bndBevelInset(ctx,x,y,w,h,
         BND_SCROLLBAR_RADIUS, BND_SCROLLBAR_RADIUS);
     bndInnerBox(ctx,x,y,w,h,
@@ -467,12 +468,17 @@ void bndScrollBar(NVGcontext *ctx,
         BND_SCROLLBAR_RADIUS,BND_SCROLLBAR_RADIUS,
         bndTransparent(bnd_theme.scrollBarTheme.outlineColor));
 
-    NVGcolor itemColor = bndOffsetColor(
-        bnd_theme.scrollBarTheme.itemColor,
-        (state == BND_ACTIVE)?BND_SCROLLBAR_ACTIVE_SHADE:0);
+    // Determine the scrollbar handle color. If active then brighten it by
+    // BND_SCROLLBAR_ACTIVE_SHADE
+    NVGcolor itemColor =
+        state != BND_ACTIVE ? bnd_theme.scrollBarTheme.itemColor
+                            : bndOffsetColor(bnd_theme.scrollBarTheme.itemColor,
+                                             BND_SCROLLBAR_ACTIVE_SHADE);
 
+    // Determine the scrollbar handle position and size
     bndScrollHandleRect(&x,&y,&w,&h,offset,size);
 
+    // Draw the scrollbar handle
     bndInnerBox(ctx,x,y,w,h,
         BND_SCROLLBAR_RADIUS,BND_SCROLLBAR_RADIUS,
         BND_SCROLLBAR_RADIUS,BND_SCROLLBAR_RADIUS,
@@ -772,7 +778,7 @@ float bndLabelWidthForFontSize(NVGcontext *ctx, int iconid, int font_size, const
 }
 
 float bndLabelHeight(NVGcontext *ctx, int iconid, const char *label, float width) {
-    return bndLabelWidthForFontSize(ctx, iconid, bnd_label_font_size, label);
+    return bndLabelHeightForFontSize(ctx, iconid, bnd_label_font_size, label, width);
 }
 
 float bndLabelHeightForFontSize(NVGcontext *ctx, int iconid, int font_size, const char *label,
