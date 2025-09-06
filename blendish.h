@@ -857,6 +857,9 @@ BND_EXPORT void bndSetIconImage(int image);
 // https://svn.blender.org/svnroot/bf-blender/trunk/blender/release/datafiles/fonts/
 BND_EXPORT void bndSetFont(int font);
 
+// Returns the handle of the currently set font
+BND_EXPORT int bndGetFont(void);
+
 // Allows the font size to be specified externally by setting global bnd_label_font_size, instead 
 // of using define statement. Used when want to use non-default font size of BND_LABEL_FONT_SIZE
 BND_EXPORT void bndSetLabelFontSize(int fontSize);

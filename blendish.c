@@ -248,6 +248,10 @@ void bndSetFont(int font) {
     bnd_font = font;
 }
 
+int bndGetFont(void) {
+    return bnd_font;
+}
+
 // Global font size for labels and text fields
 // This is set to the default Blender 2.6 font size.
 static int bnd_label_font_size = BND_LABEL_FONT_SIZE;
