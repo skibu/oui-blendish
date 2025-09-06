@@ -322,8 +322,8 @@ typedef enum BNDcornerFlags {
 // max rows for position testing
 #define BND_MAX_ROWS 32
 
-// text distance from bottom
-#define BND_TEXT_PAD_DOWN 7
+// text margin from top of box
+#define BND_TEXT_PAD_DOWN 1
 
 // stroke width of wire outline
 #define BND_NODE_WIRE_OUTLINE_WIDTH 4
@@ -842,7 +842,7 @@ typedef enum BNDicon {
 BND_EXPORT void bndSetTheme(BNDtheme theme);
 
 // Returns the currently set theme
-BND_EXPORT const BNDtheme *bndGetTheme();
+BND_EXPORT BNDtheme *bndGetTheme();
 
 // designates an image handle as returned by nvgCreateImage*() as the themes'
 // icon sheet. The icon sheet format must be compatible to Blender 2.6's icon
@@ -1004,6 +1004,13 @@ BND_EXPORT void bndMenuItem(NVGcontext *ctx,
 // Draw a tooltip background with its lower left origin at (x,y) and size of (w,h)
 BND_EXPORT void bndTooltipBackground(NVGcontext *ctx, float x, float y, float w, float h);
 
+// Draw a tooltip label with its lower left origin at (x,y) and size of (w,h).
+// Different from bndMenuLabel in that this function uses configured tooltip fg
+// color and font size.. If label is not NULL, a label will be added to the
+// widget. The widget looks best when height is BND_WIDGET_HEIGHT
+BND_EXPORT void bndTooltipLabel(NVGcontext *ctx, float x, float y, float w,
+                                float h, int font_size, const char *label);
+
 // Draw a node port at the given position filled with the given color
 BND_EXPORT void bndNodePort(NVGcontext *ctx, float x, float y, BNDwidgetState state,
     NVGcolor color);
@@ -1053,7 +1060,7 @@ BND_EXPORT float bndLabelWidthForFontSize(NVGcontext *ctx, int iconid, int font_
 /**
  * Returns the height for a label with the given icon, text, and width.
  * This function is primarily useful in conjunction with multiline labels and textboxes.
- * Uses globals bnd_font, bnd_label_font_size, and bnd_widget_height.
+ * Uses globals bnd_font andbnd_label_font_size.
  * The width parameter can be set to constrain the label to a specific width and have the text wrap.
  * If you don't want the text to wrap, use a value like INFINITY.
  */
@@ -1061,11 +1068,11 @@ BND_EXPORT float bndLabelHeight(NVGcontext *ctx, int iconid, const char *label,
     float width);
 
 /**
- * Returns the height for a label with the given icon, font size, text, and width.
- * This function is primarily useful in conjunction with multiline labels and textboxes.
- * Uses globals bnd_font and bnd_widget_height.
- * The width parameter can be set to constrain the label to a specific width and have the text wrap.
- * If you don't want the text to wrap, use a value like INFINITY.
+ * Returns the height for a label with the given icon, font size, text, and
+ * width. This function is primarily useful in conjunction with multiline labels
+ * and textboxes. Uses the global bnd_font. The width parameter can be set to
+ * constrain the label to a specific width and have the text wrap. If you don't
+ * want the text to wrap, use a value like INFINITY.
  */
 BND_EXPORT float bndLabelHeightForFontSize(NVGcontext *ctx, int iconid, int font_size,
                                            const char *label, float width);

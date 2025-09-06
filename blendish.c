@@ -230,7 +230,7 @@ void bndSetTheme(BNDtheme theme) {
     bnd_theme = theme;
 }
 
-const BNDtheme *bndGetTheme() {
+BNDtheme *bndGetTheme() {
     return &bnd_theme;
 }
 
@@ -511,15 +511,21 @@ void bndTooltipBackground(NVGcontext *ctx, float x, float y, float w, float h) {
     NVGcolor shade_top, shade_down;
 
     bndInnerColors(&shade_top, &shade_down, &bnd_theme.tooltipTheme,
-        BND_DEFAULT, 0);
-    bndInnerBox(ctx,x,y,w,h+1,
-        BND_MENU_RADIUS,BND_MENU_RADIUS,BND_MENU_RADIUS,BND_MENU_RADIUS,
-        shade_top, shade_down);
-    bndOutlineBox(ctx,x,y,w,h+1,
-        BND_MENU_RADIUS,BND_MENU_RADIUS,BND_MENU_RADIUS,BND_MENU_RADIUS,
-        bndTransparent(bnd_theme.tooltipTheme.outlineColor));
-    bndDropShadow(ctx,x,y,w,h,BND_MENU_RADIUS,
-        BND_SHADOW_FEATHER,BND_SHADOW_ALPHA);
+                   BND_DEFAULT, 0);
+    bndInnerBox(ctx, x, y, w, h + 1, BND_MENU_RADIUS, BND_MENU_RADIUS,
+                BND_MENU_RADIUS, BND_MENU_RADIUS, shade_top, shade_down);
+    bndOutlineBox(ctx, x, y, w, h + 1, BND_MENU_RADIUS, BND_MENU_RADIUS,
+                  BND_MENU_RADIUS, BND_MENU_RADIUS,
+                  bndTransparent(bnd_theme.tooltipTheme.outlineColor));
+    bndDropShadow(ctx, x, y, w, h, BND_MENU_RADIUS, BND_SHADOW_FEATHER,
+                  BND_SHADOW_ALPHA);
+}
+
+void bndTooltipLabel(NVGcontext *ctx, float x, float y, float w, float h,
+                     int font_size, const char *label) {
+    bndIconLabelValue(ctx, x, y, w, h, -1 /* No icon to display*/,
+                      bnd_theme.tooltipTheme.textColor,
+                      BND_LEFT /* left align label */, font_size, label, NULL);
 }
 
 void bndMenuLabel(NVGcontext *ctx,
@@ -783,11 +789,16 @@ float bndLabelHeight(NVGcontext *ctx, int iconid, const char *label, float width
 
 float bndLabelHeightForFontSize(NVGcontext *ctx, int iconid, int font_size, const char *label,
                                 float width) {
-    int h = bnd_widget_height;
+    // The minimu height
+    int h = font_size;
+
+    // Adjust width
     width -= BND_TEXT_RADIUS*2;
     if (iconid >= 0) {
         width -= BND_ICON_SHEET_RES;
     }
+
+    // Now determine how much vertical space needed
     if (label && (bnd_font >= 0)) {
         nvgFontFaceId(ctx, bnd_font);
         nvgFontSize(ctx, font_size);
@@ -1046,10 +1057,11 @@ void bndIconLabelValue(NVGcontext *ctx, float x, float y, float w, float h,
             x += sep_width;
             nvgText(ctx, x, y, value, NULL);
         } else {
-            nvgTextAlign(ctx,
-                (align==BND_LEFT)?(NVG_ALIGN_LEFT|NVG_ALIGN_BASELINE):
-                (NVG_ALIGN_CENTER|NVG_ALIGN_BASELINE));
-            nvgTextBox(ctx, x + pleft, y + bnd_widget_height - BND_TEXT_PAD_DOWN,
+            // Use TOP alignment so that can go down relative from the top of the box where y is 0
+            nvgTextAlign(ctx, align == BND_LEFT
+                                  ? NVG_ALIGN_LEFT | NVG_ALIGN_TOP
+                                  : (NVG_ALIGN_CENTER | NVG_ALIGN_TOP));
+            nvgTextBox(ctx, x + pleft, y + BND_TEXT_PAD_DOWN,
                        w - BND_PAD_RIGHT - pleft, label, NULL);
         }
     } else if (iconid >= 0) {
