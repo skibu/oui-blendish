@@ -553,9 +553,9 @@ void bndMenuItem(NVGcontext *ctx,
 
     // Draw the label, and center it vertically
     float y_centering_offset = (h - bnd_label_font_size) / 2.0;
-    bndIconLabelValue(ctx,x,y-y_centering_offset,w,h,iconid,
-        bndTextColor(&bnd_theme.menuItemTheme, state), BND_LEFT,
-        bnd_label_font_size, label, NULL);
+    bndIconLabelValue(ctx, x, y + y_centering_offset, w, h, iconid,
+                      bndTextColor(&bnd_theme.menuItemTheme, state), BND_LEFT,
+                      bnd_label_font_size, label, NULL);
 }
 
 void bndNodePort(NVGcontext *ctx, float x, float y, BNDwidgetState state,
@@ -1043,24 +1043,26 @@ void bndIconLabelValue(NVGcontext *ctx, float x, float y, float w, float h,
         nvgBeginPath(ctx);
         nvgFillColor(ctx, color);
         if (value) {
+            // There is a value to display, so draw the label and value on one line
             float label_width = nvgTextBounds(ctx, 1, 1, label, NULL, NULL);
             float sep_width = nvgTextBounds(ctx, 1, 1,
                 BND_LABEL_SEPARATOR, NULL, NULL);
 
-            nvgTextAlign(ctx, NVG_ALIGN_LEFT|NVG_ALIGN_BASELINE);
+            nvgTextAlign(ctx, NVG_ALIGN_LEFT|NVG_ALIGN_TOP);
             x += pleft;
             if (align == BND_CENTER) {
                 float width = label_width + sep_width
                     + nvgTextBounds(ctx, 1, 1, value, NULL, NULL);
                 x += ((w-BND_PAD_RIGHT-pleft)-width)*0.5f;
             }
-            y += bnd_widget_height - BND_TEXT_PAD_DOWN;
+            y += bnd_widget_height + BND_TEXT_PAD_DOWN;
             nvgText(ctx, x, y, label, NULL);
             x += label_width;
             nvgText(ctx, x, y, BND_LABEL_SEPARATOR, NULL);
             x += sep_width;
             nvgText(ctx, x, y, value, NULL);
         } else {
+            // There is no value to display, so just draw the label
             // Use TOP alignment so that can go down relative from the top of the box where y is 0
             nvgTextAlign(ctx, align == BND_LEFT
                                   ? NVG_ALIGN_LEFT | NVG_ALIGN_TOP
