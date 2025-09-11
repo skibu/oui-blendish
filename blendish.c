@@ -516,12 +516,16 @@ void bndTooltipBackground(NVGcontext *ctx, float x, float y, float w, float h) {
 
     bndInnerColors(&shade_top, &shade_down, &bnd_theme.tooltipTheme,
                    BND_DEFAULT, 0);
-    bndInnerBox(ctx, x, y, w, h + 1, BND_MENU_RADIUS, BND_MENU_RADIUS,
+
+    // Adjust height a bit to including the text padding
+    float height = h + 2 * BND_TEXT_PAD_DOWN;
+
+    bndInnerBox(ctx, x, y, w, height, BND_MENU_RADIUS, BND_MENU_RADIUS,
                 BND_MENU_RADIUS, BND_MENU_RADIUS, shade_top, shade_down);
-    bndOutlineBox(ctx, x, y, w, h + 1, BND_MENU_RADIUS, BND_MENU_RADIUS,
+    bndOutlineBox(ctx, x, y, w, height, BND_MENU_RADIUS, BND_MENU_RADIUS,
                   BND_MENU_RADIUS, BND_MENU_RADIUS,
                   bndTransparent(bnd_theme.tooltipTheme.outlineColor));
-    bndDropShadow(ctx, x, y, w, h, BND_MENU_RADIUS, BND_SHADOW_FEATHER,
+    bndDropShadow(ctx, x, y, w, height, BND_MENU_RADIUS, BND_SHADOW_FEATHER,
                   BND_SHADOW_ALPHA);
 }
 
