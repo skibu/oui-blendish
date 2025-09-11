@@ -287,15 +287,23 @@ void bndToolButton(NVGcontext *ctx,
     float cr[4];
     NVGcolor shade_top, shade_down;
 
+    // Setup the corners
     bndSelectCorners(cr, BND_TOOL_RADIUS, flags);
     bndBevelInset(ctx,x,y,w,h,cr[2],cr[3]);
     bndInnerColors(&shade_top, &shade_down, &bnd_theme.toolTheme, state, 1);
+
+    // Draw the button background
     bndInnerBox(ctx,x,y,w,h,cr[0],cr[1],cr[2],cr[3], shade_top, shade_down);
     bndOutlineBox(ctx,x,y,w,h,cr[0],cr[1],cr[2],cr[3],
         bndTransparent(bnd_theme.toolTheme.outlineColor));
-    bndIconLabelValue(ctx,x,y,w,h,iconid,
-        bndTextColor(&bnd_theme.toolTheme, state), BND_CENTER,
-        bnd_label_font_size, label, NULL);
+
+    // Determine extra y offset to center the label vertically
+    float adjusted_y = y + (h - 4 - bnd_label_font_size) / 2;
+
+    // Draw the label and possible icon, aligned centered horizontally and vertically
+    bndIconLabelValue(ctx, x, adjusted_y, w, h, iconid,
+                      bndTextColor(&bnd_theme.toolTheme, state), BND_CENTER,
+                      bnd_label_font_size, label, NULL);
 }
 
 void bndRadioButton(NVGcontext *ctx,
