@@ -378,23 +378,34 @@ void bndOptionButton(NVGcontext *ctx,
         bnd_label_font_size, label, NULL);
 }
 
-void bndChoiceButton(NVGcontext *ctx,
-    float x, float y, float w, float h, int flags, BNDwidgetState state,
-    int iconid, const char *label) {
+void bndChoiceButton(NVGcontext *ctx, float x, float y, float w, float h,
+                     int flags, BNDwidgetState state, int iconid,
+                     const char *label) {
     float cr[4];
     NVGcolor shade_top, shade_down;
 
+    // Set the look
     bndSelectCorners(cr, BND_OPTION_RADIUS, flags);
-    bndBevelInset(ctx,x,y,w,h,cr[2],cr[3]);
+    bndBevelInset(ctx, x, y, w, h, cr[2], cr[3]);
     bndInnerColors(&shade_top, &shade_down, &bnd_theme.choiceTheme, state, 1);
-    bndInnerBox(ctx,x,y,w,h,cr[0],cr[1],cr[2],cr[3], shade_top, shade_down);
-    bndOutlineBox(ctx,x,y,w,h,cr[0],cr[1],cr[2],cr[3],
-        bndTransparent(bnd_theme.choiceTheme.outlineColor));
-    bndIconLabelValue(ctx,x,y,w,h,iconid,
-        bndTextColor(&bnd_theme.choiceTheme, state), BND_LEFT,
-        bnd_label_font_size, label, NULL);
-    bndUpDownArrow(ctx,x+w-10,y+10,5,
-        bndTransparent(bnd_theme.choiceTheme.itemColor));
+    bndInnerBox(ctx, x, y, w, h, cr[0], cr[1], cr[2], cr[3], shade_top,
+                shade_down);
+
+    // Draw the background
+    bndOutlineBox(ctx, x, y, w, h, cr[0], cr[1], cr[2], cr[3],
+                  bndTransparent(bnd_theme.choiceTheme.outlineColor));
+
+    // Determine extra y offset to center the label vertically
+    float adjusted_y = y + (h - 4 - bnd_label_font_size) / 2;
+
+    // Draw the label and possible icon, aligned left and centered vertically
+    bndIconLabelValue(ctx, x, adjusted_y, w, h, iconid,
+                      bndTextColor(&bnd_theme.choiceTheme, state), BND_LEFT,
+                      bnd_label_font_size, label, NULL);
+
+    // Draw the up/down arrows on the right side of the button
+    bndUpDownArrow(ctx, x + w - 10, adjusted_y + 10, 5,
+                   bndTransparent(bnd_theme.choiceTheme.itemColor));
 }
 
 void bndColorButton(NVGcontext *ctx,
