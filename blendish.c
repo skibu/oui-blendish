@@ -324,29 +324,50 @@ void bndRadioButton(NVGcontext *ctx,
 }
 
 int bndTextFieldTextPosition(NVGcontext *ctx, float x, float y, float w, float h,
-    int iconid, const char *text, int px, int py) {
+    int iconid, int fontsize, const char *text, int px, int py) {
     return bndIconLabelTextPosition(ctx, x, y, w, h,
-        iconid, bnd_label_font_size, text, px, py);
+        iconid, fontsize, text, px, py);
 }
 
 void bndTextField(NVGcontext *ctx,
     float x, float y, float w, float h, int flags, BNDwidgetState state,
     int iconid, const char *text, int cbegin, int cend) {
-    float cr[4];
+    float cr[4]; // corner radii
     NVGcolor shade_top, shade_down;
 
+    // Setup look. First determine the radii for the corners
     bndSelectCorners(cr, BND_TEXT_RADIUS, flags);
-    bndBevelInset(ctx,x,y,w,h,cr[2],cr[3]);
-    bndInnerColors(&shade_top, &shade_down, &bnd_theme.textFieldTheme, state, 0);
-    bndInnerBox(ctx,x,y,w,h,cr[0],cr[1],cr[2],cr[3], shade_top, shade_down);
-    bndOutlineBox(ctx,x,y,w,h,cr[0],cr[1],cr[2],cr[3],
-        bndTransparent(bnd_theme.textFieldTheme.outlineColor));
+    bndBevelInset(ctx, x, y, w, h, cr[2], cr[3]);
+    bndInnerColors(&shade_top, &shade_down, &bnd_theme.textFieldTheme, state,
+                   0);
+
+    // Draw the background
+    bndInnerBox(ctx, x, y, w, h, cr[0], cr[1], cr[2], cr[3], shade_top,
+                shade_down);
+    bndOutlineBox(ctx, x, y, w, h, cr[0], cr[1], cr[2], cr[3],
+                  bndTransparent(bnd_theme.textFieldTheme.outlineColor));
+
+    // If the field is not active, don't show the caret
     if (state != BND_ACTIVE) {
         cend = -1;
     }
-    bndIconLabelCaret(ctx,x,y,w,h,iconid,
-        bndTextColor(&bnd_theme.textFieldTheme, state), bnd_label_font_size,
-        text, bnd_theme.textFieldTheme.itemColor, cbegin, cend);
+
+    // Draw the text
+    if (text) {
+        // Determine y for text depending on whether single or multiple lines
+        float y_for_text;
+        if (h < 2 * bnd_label_font_size) {
+            // Just single line so center it vertically
+            y_for_text = y - BND_TEXT_PAD_DOWN + (h - bnd_label_font_size) / 2;
+        } else {
+            // Multi-line so align to top with padding
+            y_for_text = y + 2;
+        }
+        bndIconLabelCaret(ctx, x, y_for_text, w, h, iconid,
+                          bndTextColor(&bnd_theme.textFieldTheme, state),
+                          bnd_label_font_size, text,
+                          bnd_theme.textFieldTheme.itemColor, cbegin, cend);
+    }
 }
 
 void bndOptionButton(NVGcontext *ctx,
@@ -1078,7 +1099,7 @@ void bndIconLabelValue(NVGcontext *ctx, float x, float y, float w, float h,
                     + nvgTextBounds(ctx, 1, 1, value, NULL, NULL);
                 x += ((w-BND_PAD_RIGHT-pleft)-width)*0.5f;
             }
-            y += bnd_widget_height + BND_TEXT_PAD_DOWN;
+            y +=  BND_TEXT_PAD_DOWN;
             nvgText(ctx, x, y, label, NULL);
             x += label_width;
             nvgText(ctx, x, y, BND_LABEL_SEPARATOR, NULL);
@@ -1131,11 +1152,11 @@ int bndIconLabelTextPosition(NVGcontext *ctx, float x, float y, float w, float h
     if (bnd_font < 0) return -1;
 
     x += pleft;
-    y += bnd_widget_height - BND_TEXT_PAD_DOWN;
+    y += BND_TEXT_PAD_DOWN;
 
     nvgFontFaceId(ctx, bnd_font);
     nvgFontSize(ctx, fontsize);
-    nvgTextAlign(ctx, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE);
+    nvgTextAlign(ctx, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
 
     w -= BND_TEXT_RADIUS + pleft;
 
@@ -1162,75 +1183,104 @@ int bndIconLabelTextPosition(NVGcontext *ctx, float x, float y, float w, float h
     return p;
 }
 
+/* Determines and returns caret position info */
 static void bndCaretPosition(NVGcontext *ctx, float x, float y,
-    float desc, float lineHeight, const char *caret, NVGtextRow *rows,int nrows,
+    float descender, float lineHeight, const char *caret, NVGtextRow *rows,int nrows,
     int *cr, float *cx, float *cy) {
     static NVGglyphPosition glyphs[BND_MAX_GLYPHS];
-    int r,nglyphs;
-    for (r=0; r < nrows-1 && rows[r].end < caret; ++r);
-    *cr = r;
+    int row,nglyphs;
+    for (row=0; row < nrows-1 && rows[row].end < caret; ++row);
+    *cr = row;
     *cx = x;
-    *cy = y-lineHeight-desc + r*lineHeight;
+    *cy = y + row*lineHeight;
     if (nrows == 0) return;
-    *cx = rows[r].minx;
+    *cx = rows[row].minx;
     nglyphs = nvgTextGlyphPositions(
-        ctx, x, y, rows[r].start, rows[r].end+1, glyphs, BND_MAX_GLYPHS);
+        ctx, x, y, rows[row].start, rows[row].end+1, glyphs, BND_MAX_GLYPHS);
     for (int i=0; i < nglyphs; ++i) {
         *cx=glyphs[i].x;
         if (glyphs[i].str == caret) break;
     }
 }
 
+int bndTextNeedsMultipleLines(NVGcontext *ctx, float w, float fontsize,
+                               const char *label) {
+    // If there is no label or the label is very short, then it can't need multiple lines
+    if (!label || strlen(label) < 5) return 0;
+
+    // Make sure a font is loaded
+    if (bnd_font < 0) return 0;
+
+    // Configure the rendering context
+    nvgFontFaceId(ctx, bnd_font);
+    if (fontsize > 0) nvgFontSize(ctx, fontsize);
+    nvgTextAlign(ctx, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+
+    // Adjust width for padding
+    float pleft = BND_TEXT_RADIUS;
+    w -= BND_TEXT_RADIUS + pleft;
+
+    // Now see how many lines are needed
+    NVGtextRow rows[BND_MAX_ROWS];
+    int nrows = nvgTextBreakLines(ctx, label, NULL, w, rows, BND_MAX_ROWS);
+
+    return nrows > 1;
+}
+
 void bndIconLabelCaret(NVGcontext *ctx, float x, float y, float w, float h,
     int iconid, NVGcolor color, float fontsize, const char *label,
-    NVGcolor caretcolor, int cbegin, int cend) {
+    NVGcolor selected_fill_color, int cbegin, int cend) {
     float pleft = BND_TEXT_RADIUS;
     if (!label) return;
+    if (bnd_font < 0) return;
+
+    // Draw icon if there is one
     if (iconid >= 0) {
         bndIcon(ctx,x+4,y+2,iconid);
         pleft += BND_ICON_SHEET_RES;
     }
 
-    if (bnd_font < 0) return;
-
-    x+=pleft;
-    y += bnd_widget_height - BND_TEXT_PAD_DOWN;
+    x += pleft;
 
     nvgFontFaceId(ctx, bnd_font);
-    nvgFontSize(ctx, fontsize);
-    nvgTextAlign(ctx, NVG_ALIGN_LEFT|NVG_ALIGN_BASELINE);
+    if (fontsize > 0)
+        nvgFontSize(ctx, fontsize);
+    nvgTextAlign(ctx, NVG_ALIGN_LEFT|NVG_ALIGN_TOP);
 
+    // Adjust width for padding
     w -= BND_TEXT_RADIUS+pleft;
 
     if (cend >= cbegin) {
-        int c0r,c1r;
-        float c0x,c0y,c1x,c1y;
-        float desc,lh;
+        int c0r, c1r;
+        float c0x, c0y, c1x, c1y;
+        float descender, lineh;
         static NVGtextRow rows[BND_MAX_ROWS];
         int nrows = nvgTextBreakLines(
             ctx, label, label+cend+1, w, rows, BND_MAX_ROWS);
-        nvgTextMetrics(ctx, NULL, &desc, &lh);
+        nvgTextMetrics(ctx, NULL, &descender, &lineh);
 
-        bndCaretPosition(ctx, x, y, desc, lh, label+cbegin,
+        bndCaretPosition(ctx, x, y, descender, lineh, label+cbegin,
             rows, nrows, &c0r, &c0x, &c0y);
-        bndCaretPosition(ctx, x, y, desc, lh, label+cend,
+        bndCaretPosition(ctx, x, y, descender, lineh, label+cend,
             rows, nrows, &c1r, &c1x, &c1y);
 
         nvgBeginPath(ctx);
         if (cbegin == cend) {
-            nvgFillColor(ctx, nvgRGBf(0.337,0.502,0.761));
-            nvgRect(ctx, c0x-1, c0y, 2, lh+1);
+            // Text isn't selected. Just draw the caret as a simple vertical line
+            nvgFillColor(ctx, nvgRGBf(0.0,0.0,0.0));
+            nvgRect(ctx, c0x - 0.5, c0y, 1.0, lineh + 1);
         } else {
-            nvgFillColor(ctx, caretcolor);
+            // Text is selected, so draw a selection box
+            nvgFillColor(ctx, selected_fill_color);
             if (c0r == c1r) {
-                nvgRect(ctx, c0x-1, c0y, c1x-c0x+1, lh+1);
+                nvgRect(ctx, c0x - 1, c0y, c1x - c0x + 1, lineh + 1);
             } else {
-                int blk=c1r-c0r-1;
-                nvgRect(ctx, c0x-1, c0y, x+w-c0x+1, lh+1);
-                nvgRect(ctx, x, c1y, c1x-x+1, lh+1);
+                int blk = c1r - c0r - 1;
+                nvgRect(ctx, c0x - 1, c0y, x + w - c0x + 1, lineh + 1);
+                nvgRect(ctx, x, c1y, c1x - x + 1, lineh + 1);
 
                 if (blk)
-                    nvgRect(ctx, x, c0y+lh, w, blk*lh+1);
+                    nvgRect(ctx, x, c0y+lineh, w, blk*lineh+1);
             }
         }
         nvgFill(ctx);

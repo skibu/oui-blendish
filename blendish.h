@@ -908,9 +908,10 @@ BND_EXPORT void bndRadioButton(NVGcontext *ctx,
 // in a text field.
 // See bndTextField for more info.
 BND_EXPORT int bndTextFieldTextPosition(NVGcontext *ctx, float x, float y, float w, float h,
-    int iconid, const char *text, int px, int py);
+    int iconid, int fontSize, const char *text, int px, int py);
 
-// Draw a text field with its lower left origin at (x,y) and size of (w,h),
+// Draw a text field, which is both the text and the ovaled background box.
+// Draw it with its lower left origin at (x,y) and size of (w,h),
 // where flags is one or multiple flags from BNDcornerFlags and state denotes
 // the widgets current UI state.
 // if iconid >= 0, an icon will be added to the widget
@@ -1192,6 +1193,9 @@ BND_EXPORT void bndNodeIconLabel(NVGcontext *ctx, float x, float y, float w, flo
 // See bndIconLabelCaret for more info.
 BND_EXPORT int bndIconLabelTextPosition(NVGcontext *ctx, float x, float y, float w, float h,
     int iconid, float fontsize, const char *label, int px, int py);
+
+BND_EXPORT int bndTextNeedsMultipleLines(NVGcontext *ctx, float w,
+                                         float fontsize, const char *label);
 
 // Draw an optional icon specified by <iconid>, an optional label and
 // a caret with given fontsize and color within a widget box.
