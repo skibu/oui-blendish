@@ -493,47 +493,46 @@ void bndSlider(NVGcontext *ctx,
         bnd_label_font_size, label, value);
 }
 
-void bndScrollBar(NVGcontext *ctx,
+void bndScrollBar(NVGcontext* ctx, float x, float y, float w, float h,
+                  BNDwidgetState state, float offset, float size) {
+  bndColoredScrollBar(ctx, x, y, w, h, state, offset, size,
+                      bnd_theme.scrollBarTheme.innerColor,
+                      bnd_theme.scrollBarTheme.itemColor);
+}
+
+void bndColoredScrollBar(NVGcontext *ctx,
     float x, float y, float w, float h, BNDwidgetState state,
-    float offset, float size) {
+    float offset, float size, NVGcolor track_color, NVGcolor handle_color) {
+  // Draw the scrollbar track that is the background of the scrollbar
+  bndBevelInset(ctx, x, y, w, h, BND_SCROLLBAR_RADIUS, BND_SCROLLBAR_RADIUS);
+  bndInnerBox(
+      ctx, x, y, w, h, BND_SCROLLBAR_RADIUS, BND_SCROLLBAR_RADIUS,
+      BND_SCROLLBAR_RADIUS, BND_SCROLLBAR_RADIUS,
+      bndOffsetColor(track_color, 3 * bnd_theme.scrollBarTheme.shadeDown),
+      bndOffsetColor(track_color, 3 * bnd_theme.scrollBarTheme.shadeTop));
+  bndOutlineBox(ctx, x, y, w, h, BND_SCROLLBAR_RADIUS, BND_SCROLLBAR_RADIUS,
+                BND_SCROLLBAR_RADIUS, BND_SCROLLBAR_RADIUS,
+                bndTransparent(bnd_theme.scrollBarTheme.outlineColor));
 
-    // Draw the scrollbar track that is the background of the scrollbar
-    bndBevelInset(ctx,x,y,w,h,
-        BND_SCROLLBAR_RADIUS, BND_SCROLLBAR_RADIUS);
-    bndInnerBox(ctx,x,y,w,h,
-        BND_SCROLLBAR_RADIUS,BND_SCROLLBAR_RADIUS,
-        BND_SCROLLBAR_RADIUS,BND_SCROLLBAR_RADIUS,
-        bndOffsetColor(
-            bnd_theme.scrollBarTheme.innerColor, 3*bnd_theme.scrollBarTheme.shadeDown),
-        bndOffsetColor(
-            bnd_theme.scrollBarTheme.innerColor, 3*bnd_theme.scrollBarTheme.shadeTop));
-    bndOutlineBox(ctx,x,y,w,h,
-        BND_SCROLLBAR_RADIUS,BND_SCROLLBAR_RADIUS,
-        BND_SCROLLBAR_RADIUS,BND_SCROLLBAR_RADIUS,
-        bndTransparent(bnd_theme.scrollBarTheme.outlineColor));
+  // Determine the scrollbar handle color. If active then brighten it by
+  // BND_SCROLLBAR_ACTIVE_SHADE
+  NVGcolor itemColor =
+      state != BND_ACTIVE
+          ? handle_color
+          : bndOffsetColor(handle_color, BND_SCROLLBAR_ACTIVE_SHADE);
 
-    // Determine the scrollbar handle color. If active then brighten it by
-    // BND_SCROLLBAR_ACTIVE_SHADE
-    NVGcolor itemColor =
-        state != BND_ACTIVE ? bnd_theme.scrollBarTheme.itemColor
-                            : bndOffsetColor(bnd_theme.scrollBarTheme.itemColor,
-                                             BND_SCROLLBAR_ACTIVE_SHADE);
+  // Determine the scrollbar handle position and size
+  bndScrollHandleRect(&x, &y, &w, &h, offset, size);
 
-    // Determine the scrollbar handle position and size
-    bndScrollHandleRect(&x,&y,&w,&h,offset,size);
-
-    // Draw the scrollbar handle
-    bndInnerBox(ctx,x,y,w,h,
-        BND_SCROLLBAR_RADIUS,BND_SCROLLBAR_RADIUS,
-        BND_SCROLLBAR_RADIUS,BND_SCROLLBAR_RADIUS,
-        bndOffsetColor(
-            itemColor, 3*bnd_theme.scrollBarTheme.shadeTop),
-        bndOffsetColor(
-            itemColor, 3*bnd_theme.scrollBarTheme.shadeDown));
-    bndOutlineBox(ctx,x,y,w,h,
-        BND_SCROLLBAR_RADIUS,BND_SCROLLBAR_RADIUS,
-        BND_SCROLLBAR_RADIUS,BND_SCROLLBAR_RADIUS,
-        bndTransparent(bnd_theme.scrollBarTheme.outlineColor));
+  // Draw the scrollbar handle
+  bndInnerBox(
+      ctx, x, y, w, h, BND_SCROLLBAR_RADIUS, BND_SCROLLBAR_RADIUS,
+      BND_SCROLLBAR_RADIUS, BND_SCROLLBAR_RADIUS,
+      bndOffsetColor(itemColor, 3 * bnd_theme.scrollBarTheme.shadeTop),
+      bndOffsetColor(itemColor, 3 * bnd_theme.scrollBarTheme.shadeDown));
+  bndOutlineBox(ctx, x, y, w, h, BND_SCROLLBAR_RADIUS, BND_SCROLLBAR_RADIUS,
+                BND_SCROLLBAR_RADIUS, BND_SCROLLBAR_RADIUS,
+                bndTransparent(bnd_theme.scrollBarTheme.outlineColor));
 }
 
 void bndMenuBackground(NVGcontext *ctx,

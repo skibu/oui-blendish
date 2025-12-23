@@ -978,10 +978,25 @@ BND_EXPORT void bndSlider(NVGcontext *ctx,
 // offset is in the range 0..1 and controls the position of the scroll handle
 // size is in the range 0..1 and controls the size of the scroll handle
 // horizontal widget looks best when height is BND_SCROLLBAR_HEIGHT,
-// vertical looks best when width is BND_SCROLLBAR_WIDTH
+// vertical looks best when width is BND_SCROLLBAR_WIDTH.
+// Uses bnd_theme.scrollBarTheme.innerColor as track color and
+// bnd_theme.scrollBarTheme.innerColor as handle color.
 BND_EXPORT void bndScrollBar(NVGcontext *ctx,
     float x, float y, float w, float h, BNDwidgetState state,
     float offset, float size);
+
+// Draw colored scrollbar with its lower left origin at (x,y) and size of (w,h),
+// where state denotes the widgets current UI state.
+// offset is in the range 0..1 and controls the position of the scroll handle
+// size is in the range 0..1 and controls the size of the scroll handle
+// horizontal widget looks best when height is BND_SCROLLBAR_HEIGHT,
+// vertical looks best when width is BND_SCROLLBAR_WIDTH.
+// track_color specifies the color of the scrollbar track
+// handle_color specifies the color of the scrollbar handle
+BND_EXPORT void bndColoredScrollBar(NVGcontext* ctx, float x, float y, float w,
+                                    float h, BNDwidgetState state, float offset,
+                                    float size, NVGcolor track_color,
+                                    NVGcolor handle_color);
 
 // Draw a menu background with its lower left origin at (x,y) and size of (w,h),
 // where flags is one or multiple flags from BNDcornerFlags.
