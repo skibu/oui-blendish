@@ -479,10 +479,9 @@ void bndSlider(NVGcontext *ctx,
     bndInnerBox(ctx,x,y,w,h,cr[0],cr[1],cr[2],cr[3], shade_top, shade_down);
 
     if (state == BND_ACTIVE) {
-        shade_top = bndOffsetColor(
-            bnd_theme.sliderTheme.itemColor, bnd_theme.sliderTheme.shadeTop);
-        shade_down = bndOffsetColor(
-            bnd_theme.sliderTheme.itemColor, bnd_theme.sliderTheme.shadeDown);
+        NVGcolor green = nvgRGBA(40, 150, 40, 255);
+        shade_top = nvgLerpRGBA(bnd_theme.sliderTheme.itemColor, green, 0.5);
+        shade_down = nvgLerpRGBA(bnd_theme.sliderTheme.itemColor, green, 0.5);
     } else {
         shade_top = bndOffsetColor(
             bnd_theme.sliderTheme.itemColor, bnd_theme.sliderTheme.shadeDown);
