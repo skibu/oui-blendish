@@ -519,7 +519,8 @@ void bndColoredScrollBar(NVGcontext *ctx,
   NVGcolor itemColor =
       state != BND_ACTIVE
           ? handle_color
-          : bndOffsetColor(handle_color, BND_SCROLLBAR_ACTIVE_SHADE);
+          : //bndOffsetColor(handle_color, BND_SCROLLBAR_ACTIVE_SHADE);
+            nvgLerpRGBA(handle_color, nvgRGBA(0, 255, 0, 100), 0.5);
 
   // Determine the scrollbar handle position and size
   bndScrollHandleRect(&x, &y, &w, &h, offset, size);
