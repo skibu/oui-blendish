@@ -584,7 +584,7 @@ void bndTooltipLabel(NVGcontext *ctx, float x, float y, float w, float h,
 void bndMenuLabel(NVGcontext *ctx,
     float x, float y, float w, float h, int iconid, const char *label) {
     bndIconLabelValue(ctx,x,y,w,h,iconid,
-        bnd_theme.menuTheme.textColor, BND_LEFT,
+        bnd_theme.menuTheme.textColor, BND_CENTER,
         bnd_label_font_size, label, NULL);
 }
 
