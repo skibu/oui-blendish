@@ -345,7 +345,7 @@ void bndTextField(NVGcontext *ctx,
     if (state == BND_ACTIVE) {
         NVGcolor green = nvgRGBA(40, 150, 40, 255);
         shade_top = nvgLerpRGBA(shade_top, green, 0.5);
-        shade_down = nvgLerpRGBA(shade_down, green, 0.5);
+        shade_down = nvgLerpRGBA(shade_down, green, 0.5); 
     }
 
     // Draw the background
