@@ -341,6 +341,13 @@ void bndTextField(NVGcontext *ctx,
     bndInnerColors(&shade_top, &shade_down, &bnd_theme.textFieldTheme, state,
                    0);
 
+    // If this text field is the active one then draw it more green to indicate such
+    if (state == BND_ACTIVE) {
+        NVGcolor green = nvgRGBA(40, 150, 40, 255);
+        shade_top = nvgLerpRGBA(shade_top, green, 0.5);
+        shade_down = nvgLerpRGBA(shade_down, green, 0.5);
+    }
+
     // Draw the background
     bndInnerBox(ctx, x, y, w, h, cr[0], cr[1], cr[2], cr[3], shade_top,
                 shade_down);
@@ -519,8 +526,7 @@ void bndColoredScrollBar(NVGcontext *ctx,
   NVGcolor itemColor =
       state != BND_ACTIVE
           ? handle_color
-          : //bndOffsetColor(handle_color, BND_SCROLLBAR_ACTIVE_SHADE);
-            nvgLerpRGBA(handle_color, nvgRGBA(0, 255, 0, 100), 0.5);
+          : nvgLerpRGBA(handle_color, nvgRGBA(0, 255, 0, 100), 0.5);
 
   // Determine the scrollbar handle position and size
   bndScrollHandleRect(&x, &y, &w, &h, offset, size);
